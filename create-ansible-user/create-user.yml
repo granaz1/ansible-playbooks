@@ -1,0 +1,14 @@
+---
+- hosts: lxc_containers
+  become: true
+  tasks:
+    - name: Create a new user
+      user:
+        name: ${{ inventory.username }}
+        group: ${{ inventory.group }}
+        state: present
+
+    - name: Add the new user to a group
+      add_member:
+        username: ${{ inventory.username }}
+        group: ${{ inventory.group }}
