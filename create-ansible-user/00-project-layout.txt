@@ -1,0 +1,11 @@
+playbook
+├── roles
+│   ├── createuser
+│   │   ├── tasks
+│   │   │   └── main.yml
+│   │   └── templates
+│   │       └── sudoers.j2
+│   └── maybecreateuser
+│       └── tasks
+│           └── main.yml
+└── site.yml
