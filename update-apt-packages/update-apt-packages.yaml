@@ -7,3 +7,11 @@
       apt:
         upgrade: yes
         update_cache: yes
+
+- hosts: proxmox, pbs
+  become: false
+  tasks:
+    - name: update apt packages
+      apt:
+        upgrade: yes
+        update_cache: yes
