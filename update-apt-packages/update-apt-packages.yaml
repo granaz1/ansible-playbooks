@@ -7,7 +7,7 @@
       apt:
         upgrade: yes
         update_cache: yes
-        
+
 - hosts: [proxmox, pbs]
   name: update apt
 
@@ -30,4 +30,4 @@
 
   - name: check for reboot required
     register: reboot_required_file
-    stat: path=/var/run/reboot-required get_md5=no
+    stat: path=/var/run/reboot-required
