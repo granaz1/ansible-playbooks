@@ -3,6 +3,9 @@
   name: update apt
   user: root
 
+  vars_files:
+    - secrets.yml
+
   tasks:
   # - name: Access secret from Vault
   #   debug:
