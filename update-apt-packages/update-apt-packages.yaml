@@ -27,5 +27,5 @@
     community.general.discord:
       webhook_id: "{{ lookup('env', 'webhook_id') }}"
       webhook_token: "{{ lookup('env', 'webhook_token') }}"
-      content: "Reboot required on {{ inventory_hostvars[inventory_hostname].ansible_fqdn }}: {{ reboot_required_file.stat.exists }}"
+      content: "Reboot required on {{ ansible_hostname }}: {{ reboot_required_file.stat.exists | ternary('Yes', 'No') }}"
     # when: reboot_required_file.stat.exists
