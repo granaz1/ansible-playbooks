@@ -22,3 +22,9 @@
   - name: check for reboot required
     register: reboot_required_file
     stat: path=/var/run/reboot-required
+
+  - name: Send Discord Webhook
+    community.general.discord:
+      webhook_id: "{{ secrets.webhook_id }}" 
+      webhook_token: "{{ secrets.webhook_token }}"
+      content: "APT updates completed! Reboot required: {{ reboot_required_file.stat.exists }}"
