@@ -23,8 +23,9 @@
     register: reboot_required_file
     stat: path=/var/run/reboot-required
 
-  - name: Send Discord Webhook
+  - name: Send Discord Webhook if Reboot Required
     community.general.discord:
       webhook_id: "{{ lookup('env', 'webhook_id') }}"
       webhook_token: "{{ lookup('env', 'webhook_token') }}"
-      content: "APT updates completed! Reboot required: {{ reboot_required_file.stat.exists }}"
+      content: "Reboot required on {{ inventory_hostvars[inventory_hostname].ansible_fqdn }}: {{ reboot_required_file.stat.exists }}"
+    # when: reboot_required_file.stat.exists
