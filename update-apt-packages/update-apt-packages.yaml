@@ -4,7 +4,7 @@
   user: root
 
   vars_files:
-    - secrets.yml
+    - /home/semaphore/.ansible/secrets.yml 
 
   tasks:
   # - name: Access secret from Vault
