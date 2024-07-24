@@ -4,6 +4,10 @@
   user: root
 
   tasks:
+  - name: Access secret from Vault
+      debug:
+        msg: "My secret is: {{ lookup('vault', 'secret_name') }}" 
+
   - name: apt update
     apt:
       update_cache: yes
