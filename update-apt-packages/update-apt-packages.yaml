@@ -25,6 +25,7 @@
 
   - name: Send Discord Webhook if Reboot Required
     community.general.discord:
+      username: Ansible
       webhook_id: "{{ lookup('env', 'webhook_id') }}"
       webhook_token: "{{ lookup('env', 'webhook_token') }}"
       content: "Reboot required on {{ ansible_hostname }}: {{ reboot_required_file.stat.exists | ternary('Yes', 'No') }}"
