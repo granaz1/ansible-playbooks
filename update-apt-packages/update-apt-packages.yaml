@@ -4,7 +4,7 @@
   user: root
 
   tasks:
-  - include_vars: secrets.yml
+  # - include_vars: secrets.yml
   - name: Access variables from file
     debug:
       msg: "Webhook ID: {{ lookup(env, webhook_id) }}"
