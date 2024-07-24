@@ -3,14 +3,12 @@
   name: update apt
   user: root
 
-  vars_files:
-    - /home/semaphore/.ansible/secrets.yml 
-
   tasks:
+  - include_vars: secrets.yml
   - name: Access variables from file
     debug:
       msg: "Webhook ID: {{ webhook_id }}"
-      # Add more debug lines for other variables if needed
+
 
   # - name: apt update
   #   apt:
