@@ -5,6 +5,11 @@
   gather_facts: no
 
   tasks:
+    - name: Install docker-py Python package
+      pip:
+        name: docker-py
+        state: present
+
     - name: Stop Vaultwarden container
       docker_container:
         name: vaultwarden
