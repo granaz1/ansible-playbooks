@@ -1,6 +1,7 @@
 ---
 - name: Backup Vaultwarden data
   hosts: docker
+  user: root
   gather_facts: no
 
   tasks:
