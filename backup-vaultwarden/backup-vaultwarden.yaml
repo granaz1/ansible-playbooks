@@ -18,41 +18,41 @@
     - name: Create backup directory
       become: yes
       file:
-        path: "{{ lookup('env', 'backup_path') }}"
+        path: "{{ lookup('env', 'backup_directory') }}"
         state: directory
         mode: '0755'
 
     - name: Create backup archive of SQLite database file
       become: yes
       shell:
-        sqlite3 data/db.sqlite3 ".backup '{{ lookup('env', 'backup_path') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
+        sqlite3 data/db.sqlite3 ".backup '{{ lookup('env', 'backup_directory') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
       when: ansible_distribution == 'Ubuntu'
 
     - name: Create backup archive of SQLite database file (VACUUM INTO)
       become: yes
       shell:
-        sqlite3 data/db.sqlite3 "VACUUM INTO '{{ lookup('env', 'backup_path') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
+        sqlite3 data/db.sqlite3 "VACUUM INTO '{{ lookup('env', 'backup_directory') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
       when: ansible_distribution == 'Ubuntu'
 
     - name: Backup attachments directory
       become: yes
       copy:
         src: data/attachments
-        dest: "{{ lookup('env', 'backup_path') }}"
+        dest: "{{ lookup('env', 'backup_directory') }}"
         mode: '0644'
 
     - name: Copy config.json file
       become: yes
       copy:
         content: "{{ vaultwarden_config_file.content }}"
-        dest: "{{ lookup('env', 'backup_path') }}/config.json"
+        dest: "{{ lookup('env', 'backup_directory') }}/config.json"
         mode: '0644'
 
     - name: Backup RSA key files
       become: yes
       copy:
         src: data/rsa_key*.der
-        dest: "{{ lookup('env', 'backup_path') }}"
+        dest: "{{ lookup('env', 'backup_directory') }}"
         mode: '0644'
 
 
