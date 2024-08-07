@@ -1,14 +1,14 @@
 ---
 - name: Backup Vaultwarden data
   hosts: docker
-  user: root
+  user: "{{ lookup('env', 'user') }}"
   gather_facts: no
 
   tasks:
     - name: Set working directory to specified path
       become: yes
       shell:
-        cd '{{ lookup('env', 'working_directory') }}'
+        cd "{{ lookup('env', 'working_directory') }}"
 
     - name: Stop Vaultwarden container
       docker_container:
