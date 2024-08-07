@@ -2,7 +2,7 @@
 - name: Backup Vaultwarden data
   hosts: docker
   user: root
-  gather_facts: no
+  gather_facts: yes
 
   tasks:
     - name: Set working directory to specified path
