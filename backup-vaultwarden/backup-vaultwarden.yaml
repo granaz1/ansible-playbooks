@@ -1,7 +1,7 @@
 ---
 - name: Backup Vaultwarden data
   hosts: docker
-  user: root
+  user: "{{ lookup('env', 'user') }}"
   gather_facts: no
 
   tasks:
