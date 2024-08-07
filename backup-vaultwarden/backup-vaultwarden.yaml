@@ -34,34 +34,27 @@
         sqlite3 data/db.sqlite3 "VACUUM INTO '{{ lookup('env', 'backup_path') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
       when: ansible_distribution == 'Ubuntu'
 
-    - name: Create backup archive of attachments directory
+    - name: Backup attachments directory
       become: yes
-      unarchive:
+      copy:
         src: data/attachments
-        dest: "{{ lookup('env', 'backup_path') }}"
-        remote_src: no
+        dest: '{{ BACKUP_PATH }}'
+        mode: '0644'
 
-    - name: Create backup archive of sends directory (optional)
-      become: yes
-      unarchive:
-        src: data/sends
-        dest: "{{ lookup('env', 'backup_path') }}"
-        remote_src: no
-      when: vaultwarden_attachments_directory.exists
-
-    - name: Create backup archive of config.json file
+    - name: Copy config.json file
       become: yes
       copy:
         content: "{{ vaultwarden_config_file.content }}"
-        dest: "{{ lookup('env', 'backup_path') }}/config.json"
+        dest: '{{ BACKUP_PATH }}/config.json'
         mode: '0644'
 
-    - name: Create backup archive of RSA key files
+    - name: Backup RSA key files
       become: yes
-      unarchive:
+      copy:
         src: data/rsa_key*.der
-        dest: "{{ lookup('env', 'backup_path') }}"
-        remote_src: no
+        dest: '{{ BACKUP_PATH }}'
+        mode: '0644'
+
 
 
    
