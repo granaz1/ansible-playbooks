@@ -33,7 +33,7 @@
 
     - name: Copy config.json file (shell command)
       ansible.builtin.command: |
-          cp {{ vaultwarden_config_file.content }} {{ lookup('env', 'backup_directory') }}/config.json
+          cp {{ lookup('env', 'working_directory') }}data/config.json {{ lookup('env', 'backup_directory') }}/config.json
       changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
     - name: Backup RSA key files (shell command)
