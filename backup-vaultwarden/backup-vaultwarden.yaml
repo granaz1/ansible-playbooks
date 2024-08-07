@@ -1,34 +1,70 @@
 ---
 - name: Backup Vaultwarden data
   hosts: docker
-  user: "{{ lookup('env', 'user') }}"
+  user: root
   gather_facts: no
 
   tasks:
-    - name: Install docker-py Python package
-      pip:
-        name:
-          - docker-py
-          - requests
-        state: present
+    - name: Set working directory to specified path
+      become: yes
+      shell:
+        cd '{{ lookup('env', 'working_directory') }}'
 
     - name: Stop Vaultwarden container
       docker_container:
         name: vaultwarden
         state: stopped
 
-    # - name: Create backup archive
-    #   become: yes
-    #   unarchive:
-    #     src: /path/to/files/backup.tar.gz
-    #     dest: /tmp/
-    #     remote_src: no
-    #   archive:
-    #     path: /path/to/files/
-    #     format: tar
-    #     compression: gzip
-    #     dest: /tmp/backup.tar.gz
+    - name: Create backup directory
+      become: yes
+      file:
+        path: "{{ lookup('env', 'backup_path') }}"
+        state: directory
+        mode: '0755'
 
+    - name: Create backup archive of SQLite database file
+      become: yes
+      shell:
+        sqlite3 data/db.sqlite3 ".backup '{{ lookup('env', 'backup_path') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Create backup archive of SQLite database file (VACUUM INTO)
+      become: yes
+      shell:
+        sqlite3 data/db.sqlite3 "VACUUM INTO '{{ lookup('env', 'backup_path') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: Create backup archive of attachments directory
+      become: yes
+      unarchive:
+        src: data/attachments
+        dest: "{{ lookup('env', 'backup_path') }}"
+        remote_src: no
+
+    - name: Create backup archive of sends directory (optional)
+      become: yes
+      unarchive:
+        src: data/sends
+        dest: "{{ lookup('env', 'backup_path') }}"
+        remote_src: no
+      when: vaultwarden_attachments_directory.exists
+
+    - name: Create backup archive of config.json file
+      become: yes
+      copy:
+        content: "{{ vaultwarden_config_file.content }}"
+        dest: "{{ lookup('env', 'backup_path') }}/config.json"
+        mode: '0644'
+
+    - name: Create backup archive of RSA key files
+      become: yes
+      unarchive:
+        src: data/rsa_key*.der
+        dest: "{{ lookup('env', 'backup_path') }}"
+        remote_src: no
+
+
+   
     # - name: Encrypt backup archive with password
     #   become: yes
     #   unarchive:
@@ -49,3 +85,15 @@
     #     service_account: "{{ gdrive_service_account }}"
     #     file_path: "/tmp/encrypted_backup.tar.gz"
     #     upload_folder: "path/to/folder/in/google/drive/"
+
+    - name: Clean up backup files on local system
+      become: yes
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items:
+        - "{{ BACKUP_PATH }}/db-$(date '+%Y%m%d-%H%M').sqlite3"
+        - "{{ BACKUP_PATH }}/config.json"
+        - "{{ BACKUP_PATH }}/{{ vaultwarden_attachments_directory.basename() }}/"
+        - "{{ BACKUP_PATH }}/{{ vaultwarden_attachments_directory.basename() }}/{{ item.file_name }}"
+      when: vaultwarden_attachments_directory.exists
