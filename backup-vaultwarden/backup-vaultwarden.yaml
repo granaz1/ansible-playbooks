@@ -66,10 +66,5 @@
 
     - name: Clean up backup files on local system
       ansible.builtin.file:
-        path: "{{ item.path }}"
+        path: "{{ lookup('env', 'backup_directory') }}/"
         state: absent
-      with_items:
-        - "{{ lookup('env', 'backup_directory') }}/db-$(date '+%Y%m%d-%H%M').sqlite3"
-        - "{{ lookup('env', 'backup_directory') }}/config.json"
-        - "{{ lookup('env', 'backup_directory') }}/{{ vaultwarden_attachments_directory.basename() }}/"
-        - "{{ lookup('env', 'backup_directory') }}/{{ vaultwarden_attachments_directory.basename() }}/{{ item.file_name }}"
