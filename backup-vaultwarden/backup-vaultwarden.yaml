@@ -69,7 +69,7 @@
         path: "{{ item.path }}"
         state: absent
       with_items:
-        - "{{ BACKUP_PATH }}/db-$(date '+%Y%m%d-%H%M').sqlite3"
-        - "{{ BACKUP_PATH }}/config.json"
-        - "{{ BACKUP_PATH }}/{{ vaultwarden_attachments_directory.basename() }}/"
-        - "{{ BACKUP_PATH }}/{{ vaultwarden_attachments_directory.basename() }}/{{ item.file_name }}"
+        - "{{ lookup('env', 'backup_directory') }}/db-$(date '+%Y%m%d-%H%M').sqlite3"
+        - "{{ lookup('env', 'backup_directory') }}/config.json"
+        - "{{ lookup('env', 'backup_directory') }}/{{ vaultwarden_attachments_directory.basename() }}/"
+        - "{{ lookup('env', 'backup_directory') }}/{{ vaultwarden_attachments_directory.basename() }}/{{ item.file_name }}"
