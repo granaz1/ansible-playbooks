@@ -7,7 +7,9 @@
   tasks:
     - name: Install docker-py Python package
       pip:
-        name: docker-py
+        name:
+          - docker-py
+          - requests
         state: present
 
     - name: Stop Vaultwarden container
