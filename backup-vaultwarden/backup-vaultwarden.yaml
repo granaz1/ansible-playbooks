@@ -41,6 +41,12 @@
           cp {{ lookup('env', 'working_directory') }}data/rsa_key*.der {{ lookup('env', 'backup_directory') }}
       changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
+    - name: Create a tar.gz archive of a single file.
+      community.general.archive:
+        path: "{{ lookup('env', 'backup_directory') }}/*"
+        dest: /tmp/backup.tar.gz
+        format: gz
+        mode: '0775'
 
    
     # - name: Encrypt backup archive with password
