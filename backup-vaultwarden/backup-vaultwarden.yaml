@@ -43,7 +43,8 @@
 
     - name: Create a tar.gz archive of a single file.
       community.general.archive:
-        path: "{{ lookup('env', 'backup_directory') }}/*"
+        path:
+          - "{{ lookup('env', 'backup_directory') }}/*"
         dest: /tmp/backup.tar.gz
         format: gz
         mode: '0775'
