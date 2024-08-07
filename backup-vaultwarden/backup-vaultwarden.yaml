@@ -71,6 +71,11 @@
     #     file_path: "/tmp/encrypted_backup.tar.gz"
     #     upload_folder: "path/to/folder/in/google/drive/"
 
+    - name: Stop Vaultwarden container
+      community.docker.docker_container:
+        name: vaultwarden
+        state: started
+
     - name: Clean up backup files on local system
       ansible.builtin.file:
         path: "{{ lookup('env', 'backup_directory') }}/"
