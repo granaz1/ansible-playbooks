@@ -1,0 +1,43 @@
+---
+- name: Backup Vaultwarden data
+  hosts: docker
+  gather_facts: no
+
+  tasks:
+    - name: Stop Vaultwarden container
+      docker_container:
+        name: vaultwarden
+        state: stopped
+
+    # - name: Create backup archive
+    #   become: yes
+    #   unarchive:
+    #     src: /path/to/files/backup.tar.gz
+    #     dest: /tmp/
+    #     remote_src: no
+    #   archive:
+    #     path: /path/to/files/
+    #     format: tar
+    #     compression: gzip
+    #     dest: /tmp/backup.tar.gz
+
+    # - name: Encrypt backup archive with password
+    #   become: yes
+    #   unarchive:
+    #     src: /tmp/backup.tar.gz
+    #     dest: /tmp/encrypted_backup.tar.gz
+    #     remote_src: no
+    #   archive:
+    #     path: /tmp/
+    #     format: tar
+    #     compression: gzip
+    #     dest: /tmp/encrypted_backup.tar.gz
+    #   shell:
+    #     openssl enc -aes-256-cbc -in /tmp/backup.tar.gz -out /tmp/encrypted_backup.tar.gz -k {{ vaultwarden_backup_password }}
+
+    # - name: Upload encrypted backup archive to Google Drive
+    #   become: yes
+    #   google_drive:
+    #     service_account: "{{ gdrive_service_account }}"
+    #     file_path: "/tmp/encrypted_backup.tar.gz"
+    #     upload_folder: "path/to/folder/in/google/drive/"
