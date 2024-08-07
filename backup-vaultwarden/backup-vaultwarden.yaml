@@ -32,7 +32,7 @@
     - name: Backup attachments directory
       become: yes
       copy:
-        src: "{{ lookup('env', 'working_directory') }}/data/attachments"
+        src: "{{ lookup('env', 'working_directory') }}data/attachments"
         dest: "{{ lookup('env', 'backup_directory') }}"
         mode: '0644'
 
@@ -46,7 +46,7 @@
     - name: Backup RSA key files
       become: yes
       copy:
-        src: "{{ lookup('env', 'working_directory') }}/data/rsa_key*.der"
+        src: "{{ lookup('env', 'working_directory') }}data/rsa_key*.der"
         dest: "{{ lookup('env', 'backup_directory') }}"
         mode: '0644'
 
