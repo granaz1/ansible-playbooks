@@ -38,21 +38,21 @@
       become: yes
       copy:
         src: data/attachments
-        dest: '{{ BACKUP_PATH }}'
+        dest: "{{ lookup('env', 'backup_path') }}"
         mode: '0644'
 
     - name: Copy config.json file
       become: yes
       copy:
         content: "{{ vaultwarden_config_file.content }}"
-        dest: '{{ BACKUP_PATH }}/config.json'
+        dest: "{{ lookup('env', 'backup_path') }}/config.json"
         mode: '0644'
 
     - name: Backup RSA key files
       become: yes
       copy:
         src: data/rsa_key*.der
-        dest: '{{ BACKUP_PATH }}'
+        dest: "{{ lookup('env', 'backup_path') }}"
         mode: '0644'
 
 
