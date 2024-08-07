@@ -2,59 +2,49 @@
 - name: Backup Vaultwarden data
   hosts: docker
   user: root
-  gather_facts: yes
+  gather_facts: true
 
   tasks:
     - name: Stop Vaultwarden container
-      docker_container:
+      community.docker.docker_container:
         name: vaultwarden
         state: stopped
 
-    - name: Create backup directory
-      become: yes
-      file:
-        path: "{{ lookup('env', 'backup_directory') }}"
-        state: directory
-        mode: '0755'
+    - name: Create backup directory on host
+      ansible.builtin.command: mkdir -p {{ lookup('env', 'backup_directory') }}
+      changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
-    - name: Create backup archive of SQLite database file
-      become: yes
-      shell:
-        sqlite3 data/db.sqlite3 ".backup '{{ lookup('env', 'backup_directory') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
+    - name: Create backup archive of SQLite database file (shell command)
+      ansible.builtin.command: |
+          sqlite3 data/db.sqlite3 ".backup '{{ lookup('env', 'backup_directory') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
       when: ansible_distribution == 'Ubuntu'
+      changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
-    - name: Create backup archive of SQLite database file (VACUUM INTO)
-      become: yes
-      shell:
-        sqlite3 data/db.sqlite3 "VACUUM INTO '{{ lookup('env', 'backup_directory') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
+    - name: Create backup archive of SQLite database file (VACUUM INTO, shell command)
+      ansible.builtin.command: |
+          sqlite3 data/db.sqlite3 "VACUUM INTO '{{ lookup('env', 'backup_directory') }}/db-$(date '+%Y%m%d-%H%M').sqlite3'"
       when: ansible_distribution == 'Ubuntu'
+      changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
-    - name: Backup attachments directory
-      become: yes
-      copy:
-        src: "{{ lookup('env', 'working_directory') }}data/attachments"
-        dest: "{{ lookup('env', 'backup_directory') }}"
-        mode: '0644'
+    - name: Backup attachments directory (shell command)
+      ansible.builtin.command: |
+          cp -r {{ lookup('env', 'working_directory') }}data/attachments {{ lookup('env', 'backup_directory') }}
+      changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
-    - name: Copy config.json file
-      become: yes
-      copy:
-        content: "{{ vaultwarden_config_file.content }}"
-        dest: "{{ lookup('env', 'backup_directory') }}/config.json"
-        mode: '0644'
+    - name: Copy config.json file (shell command)
+      ansible.builtin.command: |
+          cp {{ vaultwarden_config_file.content }} {{ lookup('env', 'backup_directory') }}/config.json
+      changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
-    - name: Backup RSA key files
-      become: yes
-      copy:
-        src: "{{ lookup('env', 'working_directory') }}data/rsa_key*.der"
-        dest: "{{ lookup('env', 'backup_directory') }}"
-        mode: '0644'
-
+    - name: Backup RSA key files (shell command)
+      ansible.builtin.command: |
+          cp {{ lookup('env', 'working_directory') }}data/rsa_key*.der {{ lookup('env', 'backup_directory') }}
+      changed_when: my_output.rc != 0 # <- Uses the return code to define when the task has changed.
 
 
    
     # - name: Encrypt backup archive with password
-    #   become: yes
+    #   
     #   unarchive:
     #     src: /tmp/backup.tar.gz
     #     dest: /tmp/encrypted_backup.tar.gz
@@ -68,15 +58,14 @@
     #     openssl enc -aes-256-cbc -in /tmp/backup.tar.gz -out /tmp/encrypted_backup.tar.gz -k {{ vaultwarden_backup_password }}
 
     # - name: Upload encrypted backup archive to Google Drive
-    #   become: yes
+    #   
     #   google_drive:
     #     service_account: "{{ gdrive_service_account }}"
     #     file_path: "/tmp/encrypted_backup.tar.gz"
     #     upload_folder: "path/to/folder/in/google/drive/"
 
     - name: Clean up backup files on local system
-      become: yes
-      file:
+      ansible.builtin.file:
         path: "{{ item.path }}"
         state: absent
       with_items:
@@ -84,4 +73,3 @@
         - "{{ BACKUP_PATH }}/config.json"
         - "{{ BACKUP_PATH }}/{{ vaultwarden_attachments_directory.basename() }}/"
         - "{{ BACKUP_PATH }}/{{ vaultwarden_attachments_directory.basename() }}/{{ item.file_name }}"
-      when: vaultwarden_attachments_directory.exists
