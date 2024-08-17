@@ -1,0 +1,27 @@
+---
+- name: Backup and restart Vaultwarden container
+  hosts: docker
+  user: dkl
+  gather_facts: true
+  variable:
+    container_location: "{{ lookup('env', 'repo_folder') }}{{ lookup('env', 'container_name') }}"
+    repo_folder: "{{ lookup('env', 'repo_folder') }}"
+    repo_url: "{{ lookup('env', 'repo_url') }}"
+
+  tasks:
+    - name: Stop Vaultwarden container
+      community.docker.docker_compose_v2:
+        project_src: {{ container_location }}
+        state: "absent"
+
+    - name: Pull new changes
+      ansible.builtin.git:
+        repo: {{ repo_url  }}
+        dest: {{ repo_folder }}
+        update: true
+        version: main
+
+    - name: Restart Vaultwarden container
+      community.docker.docker_compose_v2:
+        project_src: {{ container_location }}
+        state: "present"
